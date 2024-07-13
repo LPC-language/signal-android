@@ -3,7 +3,6 @@ package org.whispersystems.signalservice.api.services;
 import org.signal.cdsi.proto.ClientRequest;
 import org.signal.cdsi.proto.ClientResponse;
 import org.signal.libsignal.attest.AttestationDataException;
-import org.signal.libsignal.cds2.Cds2Client;
 import org.signal.libsignal.protocol.logging.Log;
 import org.signal.libsignal.protocol.util.Pair;
 import org.signal.libsignal.sgxsession.SgxCommunicationFailureException;
@@ -58,7 +57,7 @@ final class CdsiSocket {
   private final OkHttpClient  okhttp;
   private final String        mrEnclave;
 
-  private Cds2Client client;
+  private CdsiClient client;
 
   CdsiSocket(SignalServiceConfiguration configuration, String mrEnclave) {
     this.cdsiUrl   = chooseUrl(configuration.getSignalCdsiUrls());
@@ -116,7 +115,7 @@ final class CdsiSocket {
                 throw new IOException("Received a message before we were open!");
 
               case WAITING_FOR_CONNECTION:
-                client = new Cds2Client(Hex.fromStringCondensed(mrEnclave), bytes.toByteArray(), Instant.now());
+                client = new CdsiClient(Hex.fromStringCondensed(mrEnclave), bytes.toByteArray(), Instant.now());
 
                 Log.d(TAG, "[onMessage] Sending initial handshake...");
                 webSocket.send(okio.ByteString.of(client.initialRequest()));
